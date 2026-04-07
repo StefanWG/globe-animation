@@ -32,7 +32,6 @@ export const GLOBE_CONFIG = {
       { city: 'Petrovac', lat: 42.2057, lng: 18.9425 },
       { city: 'Tirana', lat: 41.3275, lng: 19.8187 },
       { city: 'Mount Olympus', lat: 40.0856, lng: 22.3586 },
-      { city: 'Athens', lat: 37.9838, lng: 23.7275 },
       { city: 'Athens', lat: 37.9838, lng: 23.7275 }
     ],
   
@@ -40,8 +39,8 @@ export const GLOBE_CONFIG = {
     arcs: {
       color: '#ff5a5f',         // Line color
       stroke: 1,              // Line thickness
-      altitude: 0, // Set to 0 for flat-on-the-ground lines
-      
+      altitude: 0,            // Set to 0 for flat-on-the-ground lines
+
       // Animation for the "Active" leg
       activeDashLength: 0.9,    // 0 to 1 (0.5 is a dash, 1 is solid)
       activeDashGap: 4,         // Space between dashes
