@@ -77,10 +77,8 @@ const Sidebar = ({ currentPath, onSelectLocation, onDeleteLocation }) => {
       <div className="city-list">
         {currentPath.map((stop, index) => (
           <div key={index} className="city-pill">
-            <div className="city-info">
-              <span className="index">{index + 1}</span>
-              <span className="city-name">{stop.city}</span>
-            </div>
+            <span className="index">{index + 1}</span>
+            <span className="city-name">{stop.city}</span>
             <button className="delete-btn" onClick={() => onDeleteLocation(index)}>×</button>
           </div>
         ))}
