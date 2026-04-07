@@ -1,182 +1,85 @@
 /* Sidebar.css */
 
-/* Sidebar Container */
 .sidebar {
-  position: relative;
-  top: 20px;
-  left: 20px;
-  width: 320px;
-  height: 100%;
-  max-height: 100%; 
-  z-index: 9999; 
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: #ffffff;
-  padding: 24px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 320px;          /* Fixed width */
+  height: 100vh;         /* Full height */
+  flex-shrink: 0;        /* Prevents the globe from squishing the sidebar */
+  
+  background: rgba(15, 15, 15, 0.9);
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-  pointer-events: auto; /* Ensures you can click/type inside */
+  padding: 24px;
+  box-sizing: border-box;
+  z-index: 10;
 }
 
-/* Section Headings */
+/* Search Bar Area */
+.search-section {
+  margin-bottom: 20px;
+}
+
 .sidebar h3 {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
   color: #888;
-  margin-bottom: 16px;
+  letter-spacing: 1px;
 }
 
-/* Search Input Styling */
 .sidebar input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  background: #222;
+  border: 1px solid #333;
   color: white;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+/* Scrollable Journey List */
+.city-list {
+  flex-grow: 1;          /* List takes up the remaining vertical space */
+  overflow-y: auto;      /* Makes the list scrollable */
+  margin-top: 20px;
+  padding-right: 5px;
+}
+
+.city-pill {
+  background: #1a1a1a;
   padding: 12px;
   border-radius: 8px;
-  margin-bottom: 12px;
-  outline: none;
-  width: 100%;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-.sidebar input:focus {
-  border-color: #ff5a5f;
-}
-
-/* Search results dropdown overlay */
-.search-results {
-  position: absolute;
-  top: 110px;
-  left: 20px;
-  right: 20px;
-  background: #1a1a1a;
-  border-radius: 8px;
-  border: 1px solid #333;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 10000;
-}
-
-.result-item {
-  padding: 10px 15px;
-  cursor: pointer;
-  border-bottom: 1px solid #333;
-  font-size: 13px;
-}
-
-.result-item:hover {
-  background: #2a2a2a;
-}
-
-/* Fixed Header and Search Sections */
-.search-section, .itinerary-header {
-  flex-shrink: 0;
-}
-
-/* The Scrollable Area */
-.city-list {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex-grow: 1; 
-  overflow-y: auto; 
-  padding-right: 8px;
-  pointer-events: auto; /* Ensures the list itself can be scrolled */
-  touch-action: pan-y;   /* Helps with scrolling on trackpads/touch */
-}
-
-/* The Row (City Pill) Improvements */
-.city-pill {
-  background: rgba(255, 255, 255, 0.03);
-  margin-bottom: 4px;
-  padding: 12px 16px;
-  border-radius: 10px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+  transition: 0.2s;
 }
 
 .city-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateX(4px);
-  border-color: rgba(255, 90, 95, 0.3);
+  border-color: #ff5a5f;
 }
 
-.city-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-  min-width: 0;
-}
-
-/* Number/Index Circle */
-.index {
-  background: #ff5a5f;
-  color: white;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-.city-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #eee;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Modern Delete Button */
 .delete-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border: none;
-  color: #666;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #555;
   cursor: pointer;
-  font-size: 16px;
-  transition: all 0.2s;
-  margin-left: 8px;
+  font-size: 18px;
 }
 
 .delete-btn:hover {
-  background: #ff5a5f;
-  color: white;
+  color: #ff5a5f;
 }
 
-/* Custom Scrollbar Styling */
+/* Scrollbar Style */
 .city-list::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
-
-.city-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
 .city-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 90, 95, 0.4);
-  border-radius: 10px;
+  background: #333;
+  border-radius: 2px;
 }

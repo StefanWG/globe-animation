@@ -3,7 +3,7 @@
 export const GLOBE_CONFIG = {
     // --- CAMERA SETTINGS ---
     camera: {
-      altitude: 0.8,            // Higher = further away, Lower = closer (e.g., 0.8)
+      altitude: 1.,            // Higher = further away, Lower = closer (e.g., 0.8)
       transitionDuration: 1000, // Time (ms) it takes to fly between cities
       pauseAtStop: 100,         // Extra time (ms) to wait before starting the next leg
     },
@@ -11,9 +11,9 @@ export const GLOBE_CONFIG = {
     // --- GLOBE VISUALS ---
     display: {
         // Classic Blue/Green Textures
-        globeImage: "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
-        topologyImage: "//unpkg.com/three-globe/example/img/earth-topology.png",
-        
+        globeImage: "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+        topologyImage: "https://unpkg.com/three-globe/example/img/earth-topology.png",
+
         // Country Border Settings
         borderGeoJson: "https://raw.githubusercontent.com/datasets/geo-boundaries-world-110m/master/countries.geojson",
         borderColor: "#ffffff",

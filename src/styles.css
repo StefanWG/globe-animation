@@ -1,82 +1,38 @@
 /* styles.css */
 
-/* 1. GLOBAL RESET 
-   Ensures the app takes up the full browser window without scrollbars 
-*/
+/* Reset browser defaults to fill the entire screen */
 html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   background-color: #000;
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  overflow: hidden; 
+  overflow: hidden; /* Prevents double scrollbars */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* 2. LAYOUT CONTAINER
-   Uses Flexbox to create a two-column layout: Sidebar | Globe
-*/
+/* The Main Container */
 .App {
-  display: flex;
+  display: flex; /* Creates the side-by-side columns */
   width: 100vw;
   height: 100vh;
-  position: relative;
 }
 
-/* 3. SIDEBAR WRAPPER
-   The actual styles for the sidebar internal elements are in Sidebar.css,
-   but this controls how the sidebar sits in the main layout.
-*/
-.sidebar {
-  /* This prevents the sidebar from shrinking when the globe is large */
-  flex-shrink: 0; 
-  width: 320px;
-  height: 100vh;
-  position: relative;
-  z-index: 10;
-  
-  /* Critical for interaction */
-  pointer-events: auto; 
-  
-  /* Visual separation */
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* 4. MAIN CONTENT (THE GLOBE)
-   This container grows to fill all space to the right of the sidebar.
-*/
+/* The Globe Container */
 .main-content {
-  flex-grow: 1; /* Take up 100% of remaining width */
+  flex-grow: 1;    /* Tells the globe to fill all remaining space */
   height: 100vh;
   position: relative;
+  overflow: hidden;
   background: #000;
-  z-index: 1;
   display: block;
 }
 
-/* 5. GLOBE COMPONENT OVERRIDE
-   Forces the Three.js canvas to fill the .main-content container 
-   completely without any padding or gaps.
-*/
-.main-content > div {
-  width: 100% !important;
-  height: 100% !important;
-}
-
+/* Force the Globe library's internal div/canvas to fill the container */
+.main-content > div, 
 canvas {
-  display: block; /* Removes tiny bottom margin common in canvas elements */
-}
-
-/* 6. UTILITY CLASSES */
-.itinerary-header {
-  flex-shrink: 0;
-  padding-bottom: 10px;
-}
-
-hr {
-  border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin: 15px 0;
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
