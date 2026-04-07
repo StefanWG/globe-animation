@@ -1,0 +1,182 @@
+/* Sidebar.css */
+
+/* Sidebar Container */
+.sidebar {
+  position: relative;
+  top: 20px;
+  left: 20px;
+  width: 320px;
+  height: 100%;
+  max-height: 100%; 
+  z-index: 9999; 
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  pointer-events: auto; /* Ensures you can click/type inside */
+}
+
+/* Section Headings */
+.sidebar h3 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 16px;
+}
+
+/* Search Input Styling */
+.sidebar input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.sidebar input:focus {
+  border-color: #ff5a5f;
+}
+
+/* Search results dropdown overlay */
+.search-results {
+  position: absolute;
+  top: 110px;
+  left: 20px;
+  right: 20px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10000;
+}
+
+.result-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #333;
+  font-size: 13px;
+}
+
+.result-item:hover {
+  background: #2a2a2a;
+}
+
+/* Fixed Header and Search Sections */
+.search-section, .itinerary-header {
+  flex-shrink: 0;
+}
+
+/* The Scrollable Area */
+.city-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1; 
+  overflow-y: auto; 
+  padding-right: 8px;
+  pointer-events: auto; /* Ensures the list itself can be scrolled */
+  touch-action: pan-y;   /* Helps with scrolling on trackpads/touch */
+}
+
+/* The Row (City Pill) Improvements */
+.city-pill {
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: 4px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.city-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+  border-color: rgba(255, 90, 95, 0.3);
+}
+
+.city-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Number/Index Circle */
+.index {
+  background: #ff5a5f;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.city-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Modern Delete Button */
+.delete-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: #666;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  margin-left: 8px;
+}
+
+.delete-btn:hover {
+  background: #ff5a5f;
+  color: white;
+}
+
+/* Custom Scrollbar Styling */
+.city-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.city-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.city-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 90, 95, 0.4);
+  border-radius: 10px;
+}
