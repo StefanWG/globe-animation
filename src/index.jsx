@@ -7,6 +7,8 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <App />
+    <BrowserRouter basename="/globe-animation">
+      <App />
+    </BrowserRouter>
   </StrictMode>
 );
