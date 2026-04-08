@@ -2,7 +2,7 @@
   "name": "globe_anim",
   "version": "1.0.0",
   "main": "index.js",
-  "homepage": "https://stefanwg.github.io/globe-animation",
+  "homepage": "https://stefanwg.github.io/globe-animation/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
