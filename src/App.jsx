@@ -4,6 +4,9 @@ import Sidebar from './Sidebar';
 import { GLOBE_CONFIG } from './globeConfig';
 import './styles.css';
 
+// Test with npm run dev
+// Deploy with npm run deploy
+
 // App.js
 function App() {
   const [journeyPath, setJourneyPath] = useState(GLOBE_CONFIG.path);
