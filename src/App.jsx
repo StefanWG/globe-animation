@@ -14,7 +14,7 @@ function App() {
 
   const [resetKey, setResetKey] = useState(0);
 
-  const handleRestart = () => {
+  const handleHardRestart = () => {
     setResetKey(prev => prev + 1); // Changing the key forces a re-render/reset
   };
 
@@ -34,7 +34,7 @@ function App() {
       {/* Sidebar - Width is controlled by Sidebar.css */}
       <Sidebar 
         currentPath={journeyPath} 
-        onRestart={handleRestart}
+        onRestart={handleHardRestart}
         onSelectLocation={handleAddLocation}
         onDeleteLocation={handleDeleteLocation}
         locations={locations}
@@ -45,6 +45,7 @@ function App() {
         <TravelGlobe 
           locations={locations} 
           dynamicPath={journeyPath} 
+          onRestart={handleHardRestart} // Pass the restart function here
           key={resetKey} // This forces a reset when the key changes
         />
       </main>
