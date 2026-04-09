@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Sidebar.css';
 
-const Sidebar = ({ currentPath, onSelectLocation, onDeleteLocation }) => {
+const Sidebar = ({ currentPath, onSelectLocation, onDeleteLocation, onRestart }) => {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
@@ -40,6 +40,12 @@ const Sidebar = ({ currentPath, onSelectLocation, onDeleteLocation }) => {
 
   return (
     <div className="sidebar">
+      <div className="sidebar-header">
+        <h2>Your Journey</h2>
+        <button className="restart-btn" onClick={onRestart} title="Restart Animation">
+          ↺
+        </button>
+      </div>
       <section className="search-section">
         <h3>Add Destination</h3>
         <input 

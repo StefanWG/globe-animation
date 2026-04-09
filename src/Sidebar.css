@@ -121,3 +121,32 @@
 .delete-btn:hover {
   color: #ff5a5f;
 }
+
+/* Sidebar.css */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.restart-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.restart-btn:hover {
+  background: #ff5a5f;
+  border-color: #ff5a5f;
+  transform: rotate(-180deg); /* Cool spin effect */
+}
