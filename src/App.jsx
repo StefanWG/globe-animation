@@ -12,6 +12,12 @@ function App() {
   const [journeyPath, setJourneyPath] = useState(GLOBE_CONFIG.path);
   const [locations, setLocations] = useState(GLOBE_CONFIG.path);
 
+  const [resetKey, setResetKey] = useState(0);
+
+  const handleRestart = () => {
+    setResetKey(prev => prev + 1); // Changing the key forces a re-render/reset
+  };
+
   const handleAddLocation = (city, lat, lng) => {
     const newPoint = { city, lat: parseFloat(lat), lng: parseFloat(lng) };
     setJourneyPath(prev => [...prev, newPoint]);
@@ -28,6 +34,7 @@ function App() {
       {/* Sidebar - Width is controlled by Sidebar.css */}
       <Sidebar 
         currentPath={journeyPath} 
+        onRestart={handleRestart}
         onSelectLocation={handleAddLocation}
         onDeleteLocation={handleDeleteLocation}
         locations={locations}
@@ -38,6 +45,7 @@ function App() {
         <TravelGlobe 
           locations={locations} 
           dynamicPath={journeyPath} 
+          key={resetKey} // This forces a reset when the key changes
         />
       </main>
     </div>
