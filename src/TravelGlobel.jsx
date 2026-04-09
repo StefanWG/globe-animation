@@ -225,12 +225,6 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
         labelSize={GLOBE_CONFIG.labels.size}
         labelColor={() => GLOBE_CONFIG.labels.color}
         labelResolution={2}
-
-        // // Pulse Ring on Current Location
-        // ringsData={locations.length > 0 && completedSteps < locations.length ? [locations[completedSteps]] : []}
-        // ringLat={d => d.lat}
-        // ringLng={d => d.lng}
-        // ringColor={() => GLOBE_CONFIG.arcs.color}
         
         atmosphereColor="#3a228a"
         atmosphereAltitude={0.15}
