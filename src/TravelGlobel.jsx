@@ -37,8 +37,19 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
     // Capture Stream
     const stream = canvas.captureStream ? canvas.captureStream(60) : canvas.mozCaptureStream(60);
     
+    // TODO: Move this to a config file
     // Setup Recorder
-    const options = { mimeType: 'video/webm;codecs=vp9' };
+    const options = { 
+      mimeType: 'video/webm;codecs=vp9',
+      videoBitsPerSecond: 8000000 // 8 Mbps for high quality
+    };
+
+    // Fallback if VP9 isn't supported
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      options.mimeType = 'video/webm';
+      options.videoBitsPerSecond = 8000000;
+    }
+
     mediaRecorder.current = new MediaRecorder(stream, MediaRecorder.isTypeSupported(options.mimeType) ? options : { mimeType: 'video/webm' });
     chunks.current = [];
 
@@ -177,6 +188,7 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
       </button>
       <Globe
         ref={globeRef}
+        devicePixelRatio={window.devicePixelRatio > 1 ? 2 : 1} // Forces 2x sharpness on most screens
         width={dimensions.width}
         height={dimensions.height}
         backgroundColor="rgba(0,0,0,0)"
@@ -214,11 +226,11 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
         labelColor={() => GLOBE_CONFIG.labels.color}
         labelResolution={2}
 
-        // Pulse Ring on Current Location
-        ringsData={locations.length > 0 && completedSteps < locations.length ? [locations[completedSteps]] : []}
-        ringLat={d => d.lat}
-        ringLng={d => d.lng}
-        ringColor={() => GLOBE_CONFIG.arcs.color}
+        // // Pulse Ring on Current Location
+        // ringsData={locations.length > 0 && completedSteps < locations.length ? [locations[completedSteps]] : []}
+        // ringLat={d => d.lat}
+        // ringLng={d => d.lng}
+        // ringColor={() => GLOBE_CONFIG.arcs.color}
         
         atmosphereColor="#3a228a"
         atmosphereAltitude={0.15}
