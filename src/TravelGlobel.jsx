@@ -97,7 +97,30 @@ const TravelGlobe = ({ locations = [] }) => {
         },
         paint: { 'text-color': '#ffffff', 'text-halo-color': 'rgba(0,0,0,0.8)', 'text-halo-width': 1.5 }
       });
-      
+
+      // Add the official Mapbox country boundaries source
+      mapInstance.addSource('admin-borders', {
+        type: 'vector',
+        url: 'mapbox://mapbox.mapbox-streets-v8'
+      });
+
+      // Add the border line layer
+      mapInstance.addLayer({
+        id: 'admin-border-lines',
+        type: 'line',
+        source: 'admin-borders',
+        'source-layer': 'admin',
+        paint: {
+          'line-color': 'rgba(255, 255, 255, 0.8)', // Faint white borders
+          'line-width': [
+            'interpolate', ['linear'], ['zoom'],
+            3, 1.0, // Thin at high altitude
+            10, 1.0 // Thicker when zoomed in
+          ]
+        },
+        filter: ['==', ['get', 'admin_level'], 0] // Level 0 = Country borders only
+      });
+            
       setCompletedSteps(0);
     });
 
