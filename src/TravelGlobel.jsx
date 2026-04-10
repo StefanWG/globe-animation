@@ -4,6 +4,22 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
+// --- Physics Constants ---
+const TRAVEL_SPEED_FACTOR = 1.5; 
+const MIN_DURATION = 1000;
+const MAX_DURATION = 3500;
+
+const getDistance = (p1, p2) => {
+  const R = 6371;
+  const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+  const dLng = (p2.lng - p1.lng) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 const TravelGlobe = ({ locations = [] }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -11,42 +27,36 @@ const TravelGlobe = ({ locations = [] }) => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorder = useRef(null);
   const chunks = useRef([]);
-  
-  const pathRef = useRef([]);
 
-  // --- 1. Initialization ---
   useEffect(() => {
     if (!mapContainer.current || !MAPBOX_TOKEN || locations.length === 0) return;
-
     mapboxgl.accessToken = MAPBOX_TOKEN;
-    pathRef.current = [[locations[0].lng, locations[0].lat]];
 
     const mapInstance = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/satellite-v9',
       projection: 'globe',
       center: [locations[0].lng, locations[0].lat],
-      zoom: 5,
-      pitch: 45,
+      zoom: 6,
+      pitch: 40,
     });
 
     map.current = mapInstance;
 
     mapInstance.on('load', () => {
-      // Route Line
-      mapInstance.addSource('route', {
-        type: 'geojson',
-        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: pathRef.current } }
-      });
-      mapInstance.addLayer({
-        id: 'route-line',
-        type: 'line',
-        source: 'route',
-        layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#ffffff', 'line-width': 4, 'line-opacity': 0.8 }
+      mapInstance.setFog({
+        color: 'rgb(186, 210, 247)',
+        'high-color': 'rgb(36, 92, 223)',
+        'horizon-blend': 0.02,
+        'space-color': 'rgb(11, 11, 25)',
+        'star-intensity': 0.6
       });
 
-      // Points & Labels Source
+      mapInstance.addSource('route', {
+        type: 'geojson',
+        data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [[locations[0].lng, locations[0].lat]] } }
+      });
+
       mapInstance.addSource('points', {
         type: 'geojson',
         data: {
@@ -59,20 +69,21 @@ const TravelGlobe = ({ locations = [] }) => {
         }
       });
 
-      // City Dots Layer
+      mapInstance.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route',
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        paint: { 'line-color': '#ffffff', 'line-width': 4, 'line-opacity': 0.8 }
+      });
+
       mapInstance.addLayer({
         id: 'city-dots',
         type: 'circle',
         source: 'points',
-        paint: {
-          'circle-radius': 6,
-          'circle-color': '#ffffff',
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#007bff'
-        }
+        paint: { 'circle-radius': 5, 'circle-color': '#ffffff', 'circle-stroke-width': 2, 'circle-stroke-color': '#007bff' }
       });
 
-      // City Labels Layer (Symbol)
       mapInstance.addLayer({
         id: 'city-labels',
         type: 'symbol',
@@ -80,60 +91,68 @@ const TravelGlobe = ({ locations = [] }) => {
         layout: {
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-          'text-size': 14,
-          'text-offset': [0, 1.5],
+          'text-size': 13,
+          'text-offset': [0, 1.2],
           'text-anchor': 'top'
         },
-        paint: {
-          'text-color': '#ffffff',
-          'text-halo-color': 'rgba(0,0,0,0.8)',
-          'text-halo-width': 2
-        }
+        paint: { 'text-color': '#ffffff', 'text-halo-color': 'rgba(0,0,0,0.8)', 'text-halo-width': 1.5 }
       });
       
       setCompletedSteps(0);
     });
 
-    return () => mapInstance.current?.remove();
+    return () => mapInstance.remove();
   }, []);
 
-  // --- 2. Animation Loop ---
   useEffect(() => {
     if (!map.current || completedSteps >= locations.length - 1) return;
 
     const start = locations[completedSteps];
     const end = locations[completedSteps + 1];
-    const duration = 3000; 
+    const distance = getDistance(start, end);
+
+    // Calculate Midpoint
+    const midLng = (start.lng + end.lng) / 2;
+    const midLat = (start.lat + end.lat) / 2;
+
+    const segmentDuration = Math.max(MIN_DURATION, Math.min(distance * TRAVEL_SPEED_FACTOR, MAX_DURATION));
     const startTime = performance.now();
 
+    // Zoom pulls back more as distance increases
+    let targetZoom = 7; 
+    if (distance > 1000) targetZoom = 4;
+    if (distance > 3000) targetZoom = 2;
+
+    // CENTER ON MIDPOINT
     map.current.flyTo({
-      center: [end.lng, end.lat],
-      zoom: 5,
-      duration: duration,
-      essential: true
+      center: [midLng, midLat],
+      zoom: targetZoom,
+      duration: segmentDuration,
+      essential: true,
+      curve: 1.0, 
+      speed: 0.4
     });
+
+    let animationFrameId;
 
     const animateUpdate = (now) => {
       const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+      const progress = Math.min(elapsed / segmentDuration, 1);
 
       const currLng = start.lng + (end.lng - start.lng) * progress;
       const currLat = start.lat + (end.lat - start.lat) * progress;
 
-      // Update Path
       const currentPath = [
         ...locations.slice(0, completedSteps + 1).map(l => [l.lng, l.lat]),
         [currLng, currLat]
       ];
 
-      // Update Points (Include City Property)
       const currentFeatures = locations.slice(0, completedSteps + 1).map(loc => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [loc.lng, loc.lat] },
         properties: { city: loc.city }
       }));
 
-      // Add final point label when arrived
       if (progress === 1) {
         currentFeatures.push({
           type: 'Feature',
@@ -145,37 +164,26 @@ const TravelGlobe = ({ locations = [] }) => {
       const routeSource = map.current.getSource('route');
       const pointSource = map.current.getSource('points');
 
-      if (routeSource) {
-        routeSource.setData({
-          type: 'Feature',
-          geometry: { type: 'LineString', coordinates: currentPath }
-        });
-      }
-
-      if (pointSource) {
-        pointSource.setData({
-          type: 'FeatureCollection',
-          features: currentFeatures
-        });
-      }
+      if (routeSource) routeSource.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: currentPath } });
+      if (pointSource) pointSource.setData({ type: 'FeatureCollection', features: currentFeatures });
 
       if (progress < 1) {
-        requestAnimationFrame(animateUpdate);
+        animationFrameId = requestAnimationFrame(animateUpdate);
       } else {
-        setTimeout(() => setCompletedSteps(prev => prev + 1), 1000);
+        setTimeout(() => setCompletedSteps(prev => prev + 1), 1500);
       }
     };
 
-    requestAnimationFrame(animateUpdate);
+    animationFrameId = requestAnimationFrame(animateUpdate);
+    return () => cancelAnimationFrame(animationFrameId);
   }, [completedSteps, locations]);
 
-  // --- 3. Recording (Standard) ---
   const startRecording = () => {
     const canvas = mapContainer.current.querySelector('canvas');
     const stream = canvas.captureStream(60);
     mediaRecorder.current = new MediaRecorder(stream, {
       mimeType: 'video/webm;codecs=vp9',
-      videoBitsPerSecond: 8000000
+      videoBitsPerSecond: 10000000 
     });
 
     chunks.current = [];
@@ -185,26 +193,28 @@ const TravelGlobe = ({ locations = [] }) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `flight-capture.webm`;
+      a.download = `midpoint-flight.webm`;
       a.click();
     };
 
     mediaRecorder.current.start();
     setIsRecording(true);
     setCompletedSteps(0);
+    map.current?.jumpTo({ center: [locations[0].lng, locations[0].lat], zoom: 5 });
   };
 
   return (
-    <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
+    <div style={{ width: '100%', height: '100vh', position: 'relative', background: '#000' }}>
       <button 
         onClick={isRecording ? () => mediaRecorder.current.stop() : startRecording}
         style={{
           position: 'absolute', top: '20px', right: '20px', zIndex: 10,
-          padding: '10px 20px', background: isRecording ? '#ff4d4d' : '#007bff',
-          color: 'white', borderRadius: '5px', cursor: 'pointer'
+          padding: '12px 24px', background: isRecording ? '#ff4d4d' : '#007bff',
+          color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold',
+          border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.4)'
         }}
       >
-        {isRecording ? "Stop" : "Record"}
+        {isRecording ? "Stop & Save" : "📹 Record Midpoint Flight"}
       </button>
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
     </div>
