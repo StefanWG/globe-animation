@@ -2,6 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import Globe from 'react-globe.gl';
 import { GLOBE_CONFIG } from './globeConfig';
 
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 const TravelGlobe = ({ locations = [], onRestart }) => {
   const globeRef = useRef();
   const containerRef = useRef();
@@ -109,38 +120,42 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
     }
   }, []);
 
-  // 3. Sequential Animation Controller
-  useEffect(() => {
-    // Reset steps if locations change externally
-    if (locations.length === 0) {
-      setCompletedSteps(0);
-      return;
-    }
+useEffect(() => {
+  // Only proceed if we aren't at the end
+  if (completedSteps < locations.length - 1) {
+    console.log("Setting timer for step:", completedSteps);
 
-    if (completedSteps < locations.length - 1) {
-      const nextCity = locations[completedSteps + 1];
+    const timer = setTimeout(() => {
+      // 1. Calculate the next index
+      const nextStep = completedSteps + 1;
+      
+      console.log("TIMER FIRED for step:", nextStep);
 
-      // Fly to the next destination
-      if (globeRef.current && nextCity) {
-        globeRef.current.pointOfView(
-          { 
-            lat: nextCity.lat, 
-            lng: nextCity.lng, 
-            altitude: GLOBE_CONFIG.camera.altitude 
-          }, 
-          GLOBE_CONFIG.camera.transitionDuration
+      // 2. Camera Logic
+      const current = locations[completedSteps];
+      const next = locations[nextStep];
+      
+      if (current && next) {
+        const dist = calculateDistance(current.lat, current.lng, next.lat, next.lng);
+        // Altitude logic
+        const alt = dist < 1500 ? 0.4 : dist > 6000 ? 1.2 : 0.8;
+
+        globeRef.current?.pointOfView(
+          { lat: next.lat, lng: next.lng, altitude: alt }, 
+          1000
         );
       }
 
-      // Wait for flight + pause before moving to the next step
-      const totalWait = GLOBE_CONFIG.camera.transitionDuration + GLOBE_CONFIG.camera.pauseAtStop;
-      const timer = setTimeout(() => {
-        setCompletedSteps(prev => prev + 1);
-      }, totalWait);
+      // 3. Increment State
+      setCompletedSteps(nextStep);
 
-      return () => clearTimeout(timer);
-    }
-  }, [completedSteps, locations]);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }
+}, [completedSteps, locations.length]); // Watching length is safer
 
   // 4. Data Formatters
   const getArcData = () => {
@@ -167,6 +182,7 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
   };
 
   return (
+    // TODO: Move the CSS to separate file
     <div ref={containerRef} className="main-content" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
       <button 
         onClick={isRecording ? stopRecording : startRecording}
@@ -187,8 +203,14 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
         {isRecording ? "Stop & Save" : "📹 Record Animation"}
       </button>
       <Globe
+        rendererConfig={{ 
+          antialias: true, 
+          alpha: true,
+          precision: 'highp',
+          logarithmicDepthBuffer: true // Helps with Z-fighting
+        }}
         ref={globeRef}
-        devicePixelRatio={window.devicePixelRatio > 1 ? 2 : 1} // Forces 2x sharpness on most screens
+        devicePixelRatio={window.devicePixelRatio} // Forces 2x sharpness on most screens
         width={dimensions.width}
         height={dimensions.height}
         backgroundColor="rgba(0,0,0,0)"
@@ -202,13 +224,15 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
         polygonCapColor={() => GLOBE_CONFIG.display.landColor}
         polygonSideColor={() => 'rgba(0, 0, 0, 0)'}
         polygonStrokeColor={() => GLOBE_CONFIG.display.borderColor}
-        polygonAltitude={0.001}
+        polygonAltitude={0.00001}
 
         // Arcs with Dynamic Animation
         arcsData={getArcData()}
         arcColor={() => GLOBE_CONFIG.arcs.color}
         arcStroke={GLOBE_CONFIG.arcs.stroke}
         arcAltitude={GLOBE_CONFIG.arcs.altitude}
+        // arcAltitudeStart={0}
+        // arcAltitudeEnd={0}
         arcDashLength={arc => arc.isLast ? GLOBE_CONFIG.arcs.activeDashLength : GLOBE_CONFIG.arcs.staticDashLength}
         arcDashGap={arc => arc.isLast ? GLOBE_CONFIG.arcs.activeDashGap : GLOBE_CONFIG.arcs.staticDashGap}
         arcDashAnimateTime={arc => arc.isLast ? GLOBE_CONFIG.arcs.activeAnimateTime : GLOBE_CONFIG.arcs.staticAnimateTime}
@@ -216,8 +240,8 @@ const TravelGlobe = ({ locations = [], onRestart }) => {
         // Points & Labels
         pointsData={getPointData()}
         pointColor={() => "#ffffff"}
-        pointRadius={0.5}
-        pointAltitude={0.01}
+        pointRadius={0.2}
+        pointAltitude={0.005}
         labelsData={getLabelData()}
         labelLat="lat"
         labelLng="lng"

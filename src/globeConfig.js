@@ -1,5 +1,7 @@
 // src/globeConfig.js
 
+const MAP_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+
 export const GLOBE_CONFIG = {
     // --- CAMERA SETTINGS ---
     camera: {
@@ -11,7 +13,8 @@ export const GLOBE_CONFIG = {
     // --- GLOBE VISUALS ---
     display: {
         // Classic Blue/Green Textures
-        globeImage: "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg",
+        globeImage: './world_map_5k.jpg', // Local image for better performance
+        // globeImage: `https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.webp?access_token=${MAPBOX_TOKEN}`,
         topologyImage: "https://unpkg.com/three-globe/example/img/earth-topology.png",
 
         // Country Border Settings
@@ -38,7 +41,7 @@ export const GLOBE_CONFIG = {
     // --- ARC STYLING (The Lines) ---
     arcs: {
       color: '#ff5a5f',         // Line color
-      stroke: 1,              // Line thickness
+      stroke: 0.5,              // Line thickness
       altitude: 0,            // Set to 0 for flat-on-the-ground lines
 
       // Animation for the "Active" leg
